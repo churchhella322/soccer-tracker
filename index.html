@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Soccer Tracker</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0b171c"><link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Soccer"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{--bg:#0b171c;--card:#132329;--ink:#eef4f1;--mute:#8da8a8;--line:#25404a;--acc:#5fd6a0;--ta:#f04848;--tb:#3d8bff;--blue:#3d8bff;--on:#062418;--soft:#1c3841;--warn:#ff7a70;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:26px;margin:4px 0 2px;letter-spacing:-.5px}.sub{color:var(--mute);margin:0 0 18px}
+.tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);padding:5px;border-radius:14px;margin-bottom:18px}
+.tabs{overflow-x:auto}.tabs button{flex:1 0 auto;white-space:nowrap;border:0;background:none;color:var(--mute);padding:10px;border-radius:10px;font:600 14px inherit;font-family:inherit;cursor:pointer}
+.tabs button.on{background:var(--acc);color:var(--on)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.hl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.hl div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.hl small{color:var(--mute);display:block;font-size:12px}.hl b{font-size:15px;display:block;margin-top:2px}.hl span{color:var(--acc);font-weight:700;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 12px;border-radius:99px;font:600 13px inherit;font-family:inherit;cursor:pointer}
+.chip.on{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.chip.a{background:var(--ta);color:#fff;border-color:var(--ta)}
+.chip.b{background:var(--tb);color:#fff;border-color:var(--tb)}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:10px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:nth-child(-n+2),td:nth-child(-n+2){text-align:left}th{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.5px;cursor:pointer;user-select:none}
+th.s{color:var(--acc)}tr:last-child td{border-bottom:0}td.pts{font-weight:800;color:var(--acc)}
+.rk{color:var(--mute);width:28px}.badge{font-size:10px;font-weight:700;background:var(--soft);color:var(--acc);padding:2px 6px;border-radius:6px;margin-left:4px;vertical-align:middle}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1;min-width:120px}
+input,select{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;width:100%}
+.btn{background:var(--acc);color:var(--on);border:0;border-radius:10px;padding:10px 16px;font:700 14px inherit;font-family:inherit;cursor:pointer;flex:none;width:auto}
+.btn.g{background:var(--soft);color:var(--acc)}.btn.d{background:none;color:var(--warn)}
+.x{flex:none!important;min-width:0!important;width:36px;background:none;border:0;color:var(--mute);font-size:20px;cursor:pointer}
+.g-h{display:flex;justify-content:space-between;gap:8px;align-items:center}.g-h b{font-size:16px}
+.muted{color:var(--mute);font-size:13px}.lbl{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 6px;display:block}
+.pl{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.score{display:flex;align-items:center;justify-content:center;gap:12px;margin:12px 0;font-size:28px;font-weight:800}
+.score .t{font-size:13px;font-weight:700}.score .ta{color:var(--ta)}.score .tb{color:var(--tb)}
+.score input{width:70px;text-align:center;font-size:22px;font-weight:800;flex:none}
+.tm{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tm h4{margin:0 0 4px;font-size:13px}.ha{color:var(--ta)}.hb{color:var(--tb)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px}
+.st{display:inline-flex;align-items:center;gap:6px}.st button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;cursor:pointer}.st b{min-width:18px;text-align:center}.pr{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 0;border-bottom:1px solid var(--line)}.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}.sg label{font-size:12px;color:var(--mute);display:block;margin-bottom:4px}select.sm{width:auto}
+.tw{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;padding-bottom:6px}.tw::-webkit-scrollbar{height:10px}.tw::-webkit-scrollbar-thumb{background:var(--acc);border-radius:9px}
+table th:nth-child(2),table td:nth-child(2){position:sticky;left:0;background:var(--card);z-index:1;box-shadow:2px 0 0 var(--line)}
+.sc{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-bottom:10px}.sc span{margin-right:auto}
+@media(max-width:560px){.hl{grid-template-columns:1fr 1fr}.tm{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<h1>⚽ Soccer Tracker</h1><p class="sub">Games, teams, scores, goals, assists and wins. Everyone with edit access sees changes live.</p>
+<div class="tabs" id="tabs"></div><div id="app"><p class="muted">Loading…</p></div></div>
+<script>
+const API_URL='PASTE_YOUR_WEB_APP_URL_HERE';
+function makeDb(API,key){
+ let cache=null,pend=0,L=[],q=Promise.resolve(),last='';
+ const fire=()=>L.forEach(l=>l.f());
+ const colDocs=n=>Object.keys(cache).filter(p=>p.startsWith(n+'/')&&p.split('/').length===2).map(p=>({id:p.split('/')[1],data:()=>cache[p]}));
+ async function load(){try{const r=await(await fetch(API+(API.includes('?')?'&':'?')+'key='+encodeURIComponent(key))).json();if(r.error)return r.error;const j=JSON.stringify(r.docs);if(!pend&&j!==last){last=j;cache=r.docs;fire()}return ''}catch(e){return 'offline'}}
+ function send(op){pend++;q=q.then(async()=>{try{const r=await(await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key,ops:[op]})})).json();if(r.error)throw new Error(r.error)}catch(e){toast('Save failed — check your connection')}finally{pend--;if(!pend)load()}})}
+ const cl=d=>JSON.parse(JSON.stringify(d));
+ const put=(p,d)=>{cache[p]=d;fire();send({op:'set',path:p,data:d})};
+ const docRef=p=>({set:async d=>put(p,cl(d)),update:async d=>put(p,{...(cache[p]||{}),...cl(d)}),delete:async()=>{delete cache[p];fire();send({op:'delete',path:p})},onSnapshot(cb){const l={f:()=>{const x=cache[p];cb({exists:!!x,data:()=>x,metadata:{hasPendingWrites:pend>0}})}};L.push(l);if(cache)l.f()}});
+ return {load,start(){setInterval(load,8000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()})},dump:()=>cache,
+  bulk(docs){Object.assign(cache,docs);last='';fire();send({op:'bulk',docs})},
+  collection:n=>({doc:id=>docRef(n+'/'+id),add:async d=>{put(n+'/'+Math.random().toString(36).slice(2,10)+Date.now().toString(36),cl(d))},onSnapshot(cb){const l={f:()=>cb({docs:colDocs(n)})};L.push(l);if(cache)l.f()}}),doc:docRef}}
+async function connect(){
+ if(API_URL.startsWith('PASTE')){$('#app').innerHTML='<div class="card"><b>Setup needed</b><p class="muted">Open index.html in a text editor and paste your Apps Script web app URL into API_URL (see SETUP.md).</p></div>';return null}
+ const get=()=>{try{return localStorage.getItem('stk')||''}catch(e){return ''}};
+ for(let tries=0;tries<50;tries++){
+  let key=get();
+  if(!key){await new Promise(res=>{$('#app').innerHTML=`<div class="card"><b>Group code</b><p class="muted">${tries?'That code did not work. ':''}Enter the code your group uses.</p><div class="row"><input id="gk" type="password" placeholder="Group code"><button class="btn" id="gb">Enter</button></div></div>`;$('#gb').onclick=()=>{const v=$('#gk').value.trim();if(v){try{localStorage.setItem('stk',v)}catch(e){}window._k=v;res()}}});key=get()||window._k}
+  const d=makeDb(API_URL,key),err=await d.load();
+  if(!err){d.start();return d}
+  if(err==='offline'){$('#app').innerHTML='<div class="card"><b>Can’t reach the server</b><p class="muted">Check your internet connection and reload.</p></div>';return null}
+  try{localStorage.removeItem('stk')}catch(e){}
+ }}
+function exportBk(){const b=new Blob([JSON.stringify({docs:db.dump()},null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='soccer-backup-'+today()+'.json';a.click()}
+function importBk(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!j.docs)throw 0;db.bulk(j.docs);toast('Backup restored')}catch(e){toast('That file is not a valid backup')}};r.readAsText(f)}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+const POS={GK:'Goalies',DEF:'Defenders',MID:'Midfielders',FWD:'Strikers / Wingers'};
+const SH={GK:'GK',DEF:'DEF',MID:'MID',FWD:'FWD'};
+const D={goal:2,assist:1,win:3,og:-10,mvp:5,dwin:4,dbase:6,dcon:-1};
+const SET=[['goal','Per goal'],['assist','Per assist'],['win','Per win'],['og','Own goal'],['mvp','MVP award'],['dwin','Defenders: team won'],['dbase','Defenders: start per game'],['dcon','Defenders: per goal conceded']];
+const F2=x=>x.toFixed(2);
+const COLS={short:[['gp','Games'],['w','W-L-D',r=>`${r.w}-${r.l}-${r.d}`],['wp','Win pts'],['ga','G/A + Def pts'],['mv','MVP'],['total','Total']],
+long:[['gp','Games'],['g','Goals'],['a','Assists'],['gpg','G/game',r=>F2(r.gpg)],['apg','A/game',r=>F2(r.apg)],['gapg','G+A/game',r=>F2(r.gapg)],['wp','Win pts'],['ga','G/A + Def pts'],['avg','Avg pts/game',r=>F2(r.avg)],['wr','Win %',r=>Math.round(r.wr)+'%'],['h','Hat tricks'],['pk','Pokers'],['pt','Penta tricks'],['tw','Team of Week'],['og','Own goals']]};
+let db,players=[],games=[],totw={},tots={},pts={...D},tab='board',posF='ALL',sortK='total',form='short',scope='cur',ed=null,ready=0,pn=null,en=null,aw='all',tv='week',cf=null,so=false;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const slug=n=>n.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const nm=id=>(players.find(p=>p.id===id)||{name:'(removed)'}).name;
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function today(){return iso(new Date())}
+function addD(s,n){const d=new Date(s+'T12:00');d.setDate(d.getDate()+n);return iso(d)}
+function mon(s){const d=new Date(s+'T12:00');d.setDate(d.getDate()-((d.getDay()+6)%7));return iso(d)}
+function fd(s){return new Date(s+'T12:00').toLocaleDateString(undefined,{month:'short',day:'numeric'})}
+function fdy(s){return new Date(s+'T12:00').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}
+function pOrd(s){const y=+s.slice(0,4),m=+s.slice(5,7),p=(m===12||m<=2)?1:m<=5?2:m<=8?3:4;return (m===12?y:y-1)*4+p}
+function pLabel(o){const p=o%4||4,y=(o-p)/4;return 'Period '+p+' · '+['Dec '+y+' – Feb '+(y+1),'Mar '+(y+1)+' – May '+(y+1),'Jun '+(y+1)+' – Aug '+(y+1),'Sep '+(y+1)+' – Nov '+(y+1)][p-1]}
+function curO(){return pOrd(today())}
+function periods(){const s=new Set([curO(),...games.map(g=>pOrd(g.date)),...Object.keys(tots).map(Number)]);return [...s].sort((a,b)=>b-a)}
+let wk=mon(today()),sp=curO();
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),3000)}
+async function w(fn){try{await fn()}catch(e){toast('Could not save — you may need edit access.')}}
+function ask(key,fn){if(cf===key){cf=null;fn();return}cf=key;render();setTimeout(()=>{if(cf===key){cf=null;render()}},4000)}
+function norm(g){const o=[];(g.goals||[]).forEach(x=>{if(x.p!==undefined)o.push(x);else if(x.og)o.push({t:x.t,p:x.s,og:1});else{o.push({t:x.t,p:x.s,g:1,a:0});if(x.a)o.push({t:x.t,p:x.a,g:0,a:1})}});return o}
+function stats(gs,ok){const m={};players.forEach(p=>m[p.id]={p,gp:0,w:0,l:0,d:0,g:0,a:0,og:0,mv:0,dp:0,h:0,pk:0,pt:0,tw:0});
+gs.forEach(g=>{const sa=g.sa||0,sb=g.sb||0,gc={};
+ [g.A||[],g.B||[]].forEach((T,i)=>{const mine=i?sb:sa,opp=i?sa:sb;
+  T.forEach(id=>{const r=m[id];if(!r)return;r.gp++;mine>opp?r.w++:mine<opp?r.l++:r.d++});
+  new Set([...((i?g.dB:g.dA)||[]),i?g.gkB:g.gkA].filter(Boolean)).forEach(id=>{if(m[id])m[id].dp+=pts.dbase+(mine>opp?pts.dwin:0)+pts.dcon*opp})});
+ norm(g).forEach(x=>{if(x.og){if(m[x.p])m[x.p].og++;return}if(m[x.p]){m[x.p].g+=x.g||0;m[x.p].a+=x.a||0;if(x.g)gc[x.p]=(gc[x.p]||0)+x.g}});
+ Object.entries(gc).forEach(([id,c])=>{if(c===3)m[id].h++;else if(c===4)m[id].pk++;else if(c>=5)m[id].pt++});
+ if(g.mvp&&m[g.mvp])m[g.mvp].mv++});
+Object.entries(totw).forEach(([k,v])=>{if(ok(k))v.forEach(id=>{if(m[id])m[id].tw++})});
+return Object.values(m).map(r=>{const ga=r.g*pts.goal+r.a*pts.assist+r.og*pts.og+r.mv*pts.mvp+r.dp,wp=r.w*pts.win,n=r.gp;
+ return {...r,ga,wp,total:ga+wp,gpg:n?r.g/n:0,apg:n?r.a/n:0,gapg:n?(r.g+r.a)/n:0,avg:n?ga/n:0,wr:n?r.w/n*100:0}})}
+function chips(items,cur,fn){return '<div class="chips">'+items.map(([k,l])=>`<button class="chip ${cur===k?'on':''}" onclick="${fn}('${k}')">${esc(l)}</button>`).join('')+'</div>'}
+function render(){
+ const sl=($('#tw')||{}).scrollLeft||0;
+ $('#tabs').innerHTML=[['board','🏆 Leaderboard'],['games','📅 Games'],['today','📋 Team maker'],['roster','👥 Players'],['awards','🥇 Awards'],['totw','⭐ Team of the Week']].map(([k,l])=>`<button class="${tab===k?'on':''}" onclick="setTab('${k}')">${l}</button>`).join('');
+ if(!ready)return;
+ $('#app').innerHTML={board,games:gamesView,today:todayView,roster,awards:awardsView,totw:totwView}[tab]();
+ if(sl&&$('#tw'))$('#tw').scrollLeft=sl;
+}
+function board(){
+ const o=scope==='cur'?curO():scope,ok=k=>scope==='all'||pOrd(k)===o;
+ const all=stats(games.filter(g=>ok(g.date)),ok);
+ const top=k=>{const b=[...all].sort((x,y)=>y[k]-x[k])[0];return b&&b[k]>0?`<b>${esc(b.p.name)}</b><span>${b[k]}</span>`:'<b>—</b>'};
+ const rows=all.filter(r=>posF==='ALL'||(r.p.pos||[]).includes(posF)).sort((a,b)=>b[sortK]-a[sortK]||b.total-a.total||a.p.name.localeCompare(b.p.name));
+ const cols=COLS[form];
+ const th=([k,l])=>`<th class="${sortK===k?'s':''}" onclick="sortBy('${k}')">${l}${sortK===k?' ↓':''}</th>`;
+ const nmCell=r=>en===r.p.id?`<input id="en" value="${esc(r.p.name)}" style="width:130px;padding:6px" onkeydown="if(event.key==='Enter')saveName('${r.p.id}')"> <button class="btn" style="padding:6px 10px" onclick="saveName('${r.p.id}')">Save</button><button class="x" onclick="en=null;render()">×</button>`:`${esc(r.p.name)}<button class="x" style="width:24px;font-size:13px" title="Edit name" onclick="en='${r.p.id}';render()">✎</button>${form==='long'?'':(r.p.pos||[]).map(x=>`<span class="badge">${SH[x]}</span>`).join('')}`;
+ const hist=periods().filter(x=>x!==curO());
+ return `<div class="hl"><div><small>Top scorer</small>${top('g')}</div><div><small>Top assister</small>${top('a')}</div><div><small>Most wins</small>${top('w')}</div><div><small>Most games played</small>${top('gp')}</div></div>
+ <div class="card"><div class="chips"><button class="chip ${scope==='cur'?'on':''}" onclick="setScope('cur')">Current · ${pLabel(curO())}</button><button class="chip ${scope==='all'?'on':''}" onclick="setScope('all')">All time</button>
+ <select class="sm" onchange="setScope(this.value)"><option value="">History…</option>${hist.map(x=>`<option value="${x}" ${scope===x?'selected':''}>${pLabel(x)}</option>`).join('')}</select></div>
+ <div class="chips" style="margin-top:12px">${[['short','Short form'],['long','Full form']].map(([k,l])=>`<button class="chip ${form===k?'on':''}" onclick="setForm('${k}')">${l}</button>`).join('')}<button class="chip" onclick="so=!so;render()">⚙ Point settings</button></div>
+ ${so?`<div class="sg">${SET.map(([k,l])=>`<div><label>${l}</label><input type="number" value="${pts[k]}" onchange="setPts('${k}',this.value)"></div>`).join('')}</div>`:''}
+ <div style="margin-top:12px">${chips([['ALL','All'],...Object.entries(POS)],posF,'setPos')}</div></div>
+ <div class="card">${form==='long'?`<div class="sc"><span class="muted">Swipe or use the arrows →</span><button class="btn g" onclick="scr(-320)">◀</button><button class="btn g" onclick="scr(320)">▶</button></div>`:''}<div class="tw" id="tw"><table style="min-width:${form==='long'?1250:660}px"><tr><th>#</th><th>Player</th>${cols.map(th).join('')}</tr>
+ ${rows.map((r,i)=>`<tr><td class="rk">${i+1}</td><td>${nmCell(r)}</td>${cols.map(([k,,f])=>`<td class="${k==='wp'||k==='ga'?'pts':''}">${f?f(r):r[k]}</td>`).join('')}</tr>`).join('')||'<tr><td colspan="20" class="muted">No players yet.</td></tr>'}</table></div></div>`}
+function gamesView(){
+ const fmt=d=>new Date(d+'T12:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+ const asc=[...games].sort((a,b)=>(a.date||'').localeCompare(b.date||'')||(a.n||0)-(b.n||0));const cnt={},num={};
+ asc.forEach(g=>{cnt[g.date]=(cnt[g.date]||0)+1;num[g.id]=cnt[g.date]});
+ const goalsOf=(g,t)=>norm(g).filter(x=>x.t===t).map(x=>x.og?`🤦 <span class="muted">own goal by</span> ${esc(nm(x.p))}`:`${x.g?`⚽ ${esc(nm(x.p))}${x.g>1?' ×'+x.g:''}`:''}${x.g&&x.a?' <span class="muted">· </span>':''}${x.a?`${x.g?'':esc(nm(x.p))+' '}<span class="muted">🅰️ ${x.a>1?'×'+x.a:'assist'}</span>`:''}`).join('<br>')||'<span class="muted">—</span>';
+ const names=ids=>(ids||[]).map(i=>esc(nm(i))).join(', ')||'—';
+ const dn=(g,t)=>{const d=(g['d'+t]||[]).map(i=>esc(nm(i))).join(', '),k=g['gk'+t];return `🛡 ${d||'—'}${k?` · 🧤 ${esc(nm(k))}`:''}`};
+ const pb=(g,k,l)=>`<button class="btn g" style="${pn&&pn.id===g.id&&pn.k===k?'outline:2px solid var(--acc)':''}" onclick="openP('${g.id}','${k}')">${l}</button>`;
+ return (ed?editor():'<button class="btn" onclick="newGame()" style="margin-bottom:14px">+ New game</button>')+
+ games.map(g=>`<div class="card"><div class="g-h"><b>${fmt(g.date)} · Game ${num[g.id]}</b></div>
+ <div class="score" style="font-size:24px"><span class="t ta">Team A</span><span>${g.sa??0} – ${g.sb??0}</span><span class="t tb">Team B</span></div>
+ <div class="tm"><div><h4 class="ha">Team A</h4><div class="muted">${names(g.A)}</div><div class="muted" style="margin-top:6px">${dn(g,'A')}</div><div style="margin-top:8px">${goalsOf(g,'A')}</div></div>
+ <div><h4 class="hb">Team B</h4><div class="muted">${names(g.B)}</div><div class="muted" style="margin-top:6px">${dn(g,'B')}</div><div style="margin-top:8px">${goalsOf(g,'B')}</div></div></div>
+ ${g.mvp?`<div style="margin-top:10px">⭐ MVP: <b>${esc(nm(g.mvp))}</b></div>`:''}
+ <div class="chips" style="margin-top:12px">${pb(g,'def','🛡 Defenders')}${pb(g,'gk','🧤 Goalie')}${pb(g,'mvp','⭐ MVP')}<button class="btn g" onclick="editGame('${g.id}')">Edit</button><button class="btn d" onclick="delGame2('${g.id}')">${cf==='g'+g.id?'Tap again to confirm':'Delete'}</button></div>${panel(g)}</div>`).join('')||(ed?'':'<p class="muted">No games yet — add your first one.</p>')}
+function panel(g){
+ if(!pn||pn.id!==g.id)return '';
+ const col=t=>`<div><h4 class="${t==='A'?'ha':'hb'}">Team ${t}</h4><div class="chips">${(g[t]||[]).map(id=>{const on=pn.k==='def'?(g['d'+t]||[]).includes(id):pn.k==='gk'?g['gk'+t]===id:g.mvp===id;return `<button class="chip ${on?t.toLowerCase():''}" onclick="pick('${g.id}','${t}','${id}')">${esc(nm(id))}</button>`}).join('')||'<span class="muted">No players</span>'}</div></div>`;
+ return `<div class="card" style="background:var(--bg);margin:12px 0 0"><div class="muted" style="margin-bottom:8px">${{def:'Tap the defenders for each team (saves instantly)',gk:'Tap the goalie for each team (tap again to clear)',mvp:'Tap the MVP of the game (tap again to clear)'}[pn.k]}</div><div class="tm">${col('A')}${col('B')}</div></div>`}
+function goalBlock(t){
+ const ids=t==='A'?ed.A:ed.B,oth=t==='A'?ed.B:ed.A;
+ const st=(id,k)=>`<span class="st"><button onclick="bump('${id}','${k}',-1)">−</button><b>${(ed.gm[id]||{})[k]||0}</b><button onclick="bump('${id}','${k}',1)">+</button></span>`;
+ const ogs=ed.og.map((x,i)=>x.t===t?`<div class="pr"><span>🤦 ${esc(nm(x.p))}</span><button class="x" onclick="rmOG(${i})">×</button></div>`:'').join('');
+ return `<div><h4 class="${t==='A'?'ha':'hb'}">Team ${t}</h4>`+
+ (ids.map(id=>`<div class="pr"><span>${esc(nm(id))}</span><span class="st">⚽ ${st(id,'g')} 🅰️ ${st(id,'a')}</span></div>`).join('')||'<span class="muted">Pick this team’s players first</span>')+
+ `<span class="lbl">Own goal for Team ${t} — who scored it? (a Team ${t==='A'?'B':'A'} player)</span>${ogs}<select onchange="addOG('${t}',this.value)"><option value="">+ Own goal by…</option>${oth.map(i=>`<option value="${i}">${esc(nm(i))}</option>`).join('')}</select></div>`}
+function editor(){
+ return `<div class="card"><b>${ed.id?'Edit game':'New game'}</b><span class="lbl">Date</span><input type="date" value="${ed.date}" oninput="ed.date=this.value">
+ <span class="lbl">Who played? Tap once for Team A, twice for Team B, three times to remove</span>
+ <div class="chips">${players.map(p=>{const c=ed.A.includes(p.id)?'a':ed.B.includes(p.id)?'b':'';return `<button class="chip ${c}" onclick="togP('${p.id}')">${esc(p.name)}</button>`}).join('')}</div>
+ <div class="muted" style="margin-top:8px"><span class="ha">Team A: ${ed.A.length}</span> · <span class="hb">Team B: ${ed.B.length}</span></div>
+ <span class="lbl">Score</span>
+ <div class="score"><span class="t ta">Team A</span><input type="number" min="0" value="${ed.sa}" oninput="ed.sa=+this.value;ed.manual=true"><span>–</span><input type="number" min="0" value="${ed.sb}" oninput="ed.sb=+this.value;ed.manual=true"><span class="t tb">Team B</span></div>
+ <span class="lbl">Goals ⚽ and assists 🅰️ for each player (use + and −)</span>
+ <div class="tm">${goalBlock('A')}${goalBlock('B')}</div>
+ ${ed.err?`<div style="margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--soft);color:var(--warn);font-weight:700">⚠ ${esc(ed.err)}</div>`:''}<div class="row" style="margin-top:18px"><button class="btn" onclick="saveGame()">Save game</button><button class="btn g" onclick="ed=null;render()">Cancel</button>${ed.id?`<button class="btn d" onclick="delGame()">${cf==='e'?'Tap again to confirm':'Delete'}</button>`:''}</div></div>`}
+function roster(){
+ return `<div class="card"><b>Add a player</b><div class="row" style="margin-top:10px"><input id="pn" placeholder="Name (e.g. Alex K)"></div>
+ <div class="chips" style="margin:10px 0">${Object.entries(POS).map(([k,l])=>`<label class="chip"><input type="checkbox" class="pc" value="${k}" style="width:auto;margin-right:6px">${l}</label>`).join('')}</div>
+ <button class="btn" onclick="addPlayer()">Add player</button><p class="muted">Tap a position under a player to add or remove it. Players can have several.</p></div>
+ <div class="card"><b>Backup</b><p class="muted">Download a copy of all your data, or restore one.</p><div class="row"><button class="btn g" onclick="exportBk()">⬇ Download backup</button><label class="btn g" style="text-align:center;cursor:pointer">⬆ Restore backup<input type="file" accept=".json" style="display:none" onchange="importBk(this.files[0])"></label></div></div>
+ <div class="card">${players.map(p=>`<div class="pl"><b>${esc(p.name)}</b><div class="chips">${Object.keys(POS).map(k=>`<button class="chip ${(p.pos||[]).includes(k)?'on':''}" onclick="togPos('${p.id}','${k}')">${SH[k]}</button>`).join('')}<button class="x" onclick="delPlayer('${p.id}')" title="Remove" style="${cf==='p'+p.id?'width:auto;color:var(--warn);font-size:13px;font-weight:700':''}">${cf==='p'+p.id?'Tap again to remove':'×'}</button></div></div>`).join('')}</div>`}
+function topOf(all,k){const mx=Math.max(0,...all.map(r=>r[k]));return mx>0?{v:mx,n:all.filter(r=>r[k]===mx).map(r=>r.p.name).join(', ')}:null}
+const AW=[['g','🥇 Best goalscorer'],['a','🎯 Best assister'],['mv','⭐ Most MVPs']];
+function awardsView(){
+ let body;
+ if(aw==='all'){const all=stats(games,()=>true);
+  body=AW.map(([k,l])=>{const t=topOf(all,k),top=[...all].filter(r=>r[k]>0).sort((x,y)=>y[k]-x[k]).slice(0,5);
+   return `<div class="card"><b>${l} · all time</b>${t?`<div style="font-size:22px;font-weight:800;color:var(--acc);margin:6px 0">${esc(t.n)} · ${t.v}</div>`:'<div class="muted" style="margin:6px 0">No data yet</div>'}<div class="muted">${top.map((r,i)=>`${i+1}. ${esc(r.p.name)} ${r[k]}`).join(' &nbsp;·&nbsp; ')}</div></div>`}).join('')}
+ else body=periods().map(o=>{const all=stats(games.filter(g=>pOrd(g.date)===o),()=>false);
+  return `<div class="card"><b>${pLabel(o)}</b>${o===curO()?' <span class="badge">in progress</span>':''}${AW.map(([k,l])=>{const t=topOf(all,k);return `<div class="pl"><span>${l}</span><b>${t?esc(t.n)+' · '+t.v:'—'}</b></div>`}).join('')}</div>`}).join('');
+ return chips([['all','All-time'],['hist','History']],aw,'setAw')+'<div style="height:14px"></div>'+body}
+function totwView(){
+ const wkTeam=tv==='week',sel=wkTeam?(totw[wk]||[]):(tots[sp]||[]);
+ const nav=wkTeam?`<div class="row" style="margin:14px 0"><button class="btn g" onclick="wk=addD(wk,-7);render()">‹ Prev</button><b style="text-align:center">Mon ${fdy(wk)} – Sun ${fdy(addD(wk,6))}</b><button class="btn g" onclick="wk=addD(wk,7);render()">Next ›</button></div>`
+  :`<select onchange="sp=+this.value;render()" style="margin:14px 0">${periods().map(o=>`<option value="${o}" ${o===sp?'selected':''}>${pLabel(o)}${o===curO()?' (current)':''}</option>`).join('')}</select>`;
+ const prev=wkTeam?Object.keys(totw).sort().reverse().map(k=>[`Mon ${fdy(k)} – Sun ${fdy(addD(k,6))}`,totw[k]]):Object.keys(tots).map(Number).sort((a,b)=>b-a).map(k=>[pLabel(k),tots[k]]);
+ return chips([['week','Team of the Week'],['season','Team of the Season']],tv,'setTv')+nav+
+ `<div class="card"><b>${wkTeam?'Pick this week’s team':'Pick this period’s team'} (${sel.length})</b><div class="chips" style="margin-top:10px">${players.map(p=>`<button class="chip ${sel.includes(p.id)?'on':''}" onclick="togT('${p.id}')">${esc(p.name)}</button>`).join('')}</div></div>
+ <div class="card"><b>Saved teams</b>${prev.filter(x=>x[1].length).map(([l,ids])=>`<div class="pl"><span class="muted">${l}</span><span>${ids.map(i=>esc(nm(i))).join(', ')}</span></div>`).join('')||'<p class="muted">Nothing saved yet.</p>'}</div>`}
+let here=[],tm=null,tpos={};
+function getP(id){return tpos[id]||((players.find(p=>p.id===id)||{}).pos||[])}
+function togTP(id,k){const c=getP(id),n=c.includes(k)?c.filter(x=>x!==k):[...c,k];if(!n.length){toast('Pick at least one position');return}tpos={...tpos,[id]:n};tm=null;savH();render()}
+function scr(n){const e=$('#tw');if(e)e.scrollBy({left:n,behavior:'smooth'})}
+function savH(){w(()=>db.doc('settings/today').set({date:today(),ids:here,pos:tpos}))}
+function togH(id){here=here.includes(id)?here.filter(i=>i!==id):[...here,id];tm=null;savH();render()}
+function allH(){here=players.map(p=>p.id);tm=null;savH();render()}
+function clrH(){here=[];tpos={};tm=null;savH();render()}
+function moveT(id){if(tm.A.includes(id)){tm.A=tm.A.filter(i=>i!==id);tm.B=[...tm.B,id]}else{tm.B=tm.B.filter(i=>i!==id);tm.A=[...tm.A,id]}render()}
+function startGame(){newGame();ed.A=[...tm.A];ed.B=[...tm.B];sync();tab='games';render();scrollTo(0,0)}
+function cntR(l,r){const t={};l.forEach(i=>{t[r[i]]=(t[r[i]]||0)+1});return t}
+function posSum(l,r){const t=cntR(l,r);return Object.keys(POS).map(k=>SH[k]+' '+(t[k]||0)).join(' · ')}
+function makeTeams(){
+ const ids=here.filter(i=>players.some(p=>p.id===i));if(ids.length<2){toast('Pick at least 2 players');return}
+ const all=stats(games,()=>true),v={},withG=all.filter(r=>r.gp>0),mean=withG.length?withG.reduce((n,r)=>n+r.avg,0)/withG.length:0;
+ all.forEach(r=>{v[r.p.id]=r.gp>0?r.avg:mean});
+ const KS=[...Object.keys(POS),'NA'];
+ const role0=id=>{const ps=getP(id);return ps.length?ps[Math.random()*ps.length|0]:'NA'};
+ const cost=(A,B,r)=>{const sm=l=>l.reduce((n,i)=>n+(v[i]||0),0),a=cntR(A,r),b=cntR(B,r);let c=Math.abs(A.length-B.length)*500+Math.abs(sm(A)-sm(B));KS.forEach(k=>c+=1000*Math.abs((a[k]||0)-(b[k]||0)));return c};
+ let best=null;
+ for(let n=0;n<14;n++){const s=[...ids].sort(()=>Math.random()-.5),h=Math.ceil(s.length/2);let A=s.slice(0,h),B=s.slice(h),r={};ids.forEach(i=>r[i]=role0(i));let c=cost(A,B,r);
+  for(let it=0;it<2500;it++){let A2=[...A],B2=[...B],r2={...r};const q=Math.random();
+   if(q<.5){const i=Math.random()*A2.length|0,j=Math.random()*B2.length|0;[A2[i],B2[j]]=[B2[j],A2[i]]}
+   else if(q<.85){const i=ids[Math.random()*ids.length|0];r2[i]=role0(i)}
+   else if(q<.93){if(Math.random()<.5&&A2.length>1)B2.push(A2.splice(Math.random()*A2.length|0,1)[0]);else if(B2.length>1)A2.push(B2.splice(Math.random()*B2.length|0,1)[0])}
+   else{const i=Math.random()*A2.length|0,j=Math.random()*B2.length|0;[A2[i],B2[j]]=[B2[j],A2[i]];const k=ids[Math.random()*ids.length|0];r2[k]=role0(k)}
+   const c2=cost(A2,B2,r2);if(c2<=c){A=A2;B=B2;r=r2;c=c2}}
+  if(!best||c<best.c-1e-9)best={A,B,r,c}}
+ if(Math.random()<.5)[best.A,best.B]=[best.B,best.A];
+ tm={A:best.A,B:best.B,v,r:best.r};render()}
+function teamsCard(){
+ const order=l=>[...l].sort((x,y)=>Object.keys(POS).indexOf(tm.r[x])-Object.keys(POS).indexOf(tm.r[y])||nm(x).localeCompare(nm(y)));
+ const col=T=>{const l=tm[T],sm=l.reduce((n,i)=>n+(tm.v[i]||0),0);
+  return `<div><h4 class="${T==='A'?'ha':'hb'}">Team ${T} · ${l.length} players · rating ${sm.toFixed(1)}</h4><div class="muted" style="margin-bottom:6px">${posSum(l,tm.r)}</div>${order(l).map(id=>`<div class="pr"><span>${esc(nm(id))} <span class="badge">${SH[tm.r[id]]||'—'}</span></span><span><span class="muted">${(tm.v[id]||0).toFixed(1)}</span> <button class="chip ${T==='A'?'a':'b'}" style="padding:3px 10px" onclick="moveT('${id}')">${T==='A'?'→ B':'→ A'}</button></span></div>`).join('')}</div>`};
+ const a=cntR(tm.A,tm.r),b=cntR(tm.B,tm.r),odd=Object.keys(POS).filter(k=>(a[k]||0)!==(b[k]||0)).map(k=>POS[k].toLowerCase());
+ return `<div class="card"><b>Teams</b>${odd.length?`<p class="muted">Not every position can be split equally with today’s group (${odd.join(', ')}), so one team has one extra there.</p>`:'<p class="muted">Both teams have the same number of players in every position.</p>'}<div class="tm" style="margin-top:10px">${col('A')}${col('B')}</div><div class="row" style="margin-top:16px"><button class="btn" onclick="startGame()">Start game with these teams</button></div></div>`}
+function todayView(){
+ const grp=Object.entries(POS).map(([k,l])=>{const ps=players.filter(p=>(p.pos||[]).includes(k));return ps.length?`<span class="lbl">${l}</span><div class="chips">${ps.map(p=>`<button class="chip ${here.includes(p.id)?'on':''}" onclick="togH('${p.id}')">${esc(p.name)}</button>`).join('')}</div>`:''}).join('');
+ const n=players.filter(p=>here.includes(p.id)).length;
+ return `<div class="card"><div class="g-h"><b>Who came today? (${n})</b><div class="chips"><button class="btn g" onclick="allH()">Select all</button><button class="btn g" onclick="clrH()">Clear</button></div></div>${grp}
+ ${n?`<span class="lbl">Positions for today — tap to choose where each player can play</span>${players.filter(p=>here.includes(p.id)).map(p=>`<div class="pr"><span>${esc(p.name)}</span><span class="chips">${Object.keys(POS).map(k=>`<button class="chip ${getP(p.id).includes(k)?'on':''}" style="padding:3px 10px" onclick="togTP('${p.id}','${k}')">${SH[k]}</button>`).join('')}</span></div>`).join('')}`:''}
+ <button class="btn" style="margin-top:16px;${n<2?'opacity:.5':''}" onclick="makeTeams()" ${n<2?'disabled':''}>${tm?'🔀 Re-make teams':'⚖ Make fair teams'}</button>
+ <p class="muted">Each team gets the same number of players in every position (goalie, defender, midfielder, striker/winger). Choose one position or several for each player above (for example Kevin as goalie only today); players with several are placed where they’re needed, and teams are balanced by each player’s all-time average points per game. New players count as the league average. Tap → to move someone.</p></div>`+(tm?teamsCard():'')}
+function setTab(t){tab=t;render()}function setPos(p){posF=p;render()}function sortBy(k){sortK=k;render()}
+function setForm(f){form=f;render()}function setAw(a){aw=a;render()}function setTv(v){tv=v;render()}
+function setScope(v){if(v==='')return;scope=(v==='cur'||v==='all')?v:+v;render()}
+function setPts(k,v){pts[k]=Number(v)||0;w(()=>db.doc('settings/points').set(pts));render()}
+function saveName(id){const v=($('#en').value||'').trim();en=null;render();if(v)w(()=>db.collection('players').doc(id).update({name:v}))}
+function togT(id){const cur=[...(wkTeam_get())];const i=cur.indexOf(id);i<0?cur.push(id):cur.splice(i,1);
+ w(()=>tv==='week'?db.collection('totw').doc(wk).set({players:cur}):db.collection('tots').doc(String(sp)).set({players:cur}))}
+function wkTeam_get(){return tv==='week'?(totw[wk]||[]):(tots[sp]||[])}
+function openP(id,k){pn=(pn&&pn.id===id&&pn.k===k)?null:{id,k};render()}
+function pick(gid,t,id){const g=games.find(x=>x.id===gid),r=db.collection('games').doc(gid);
+ if(pn.k==='def'){const s=new Set(g['d'+t]||[]);s.has(id)?s.delete(id):s.add(id);w(()=>r.update({['d'+t]:[...s]}))}
+ else if(pn.k==='gk')w(()=>r.update({['gk'+t]:g['gk'+t]===id?'':id}));
+ else w(()=>r.update({mvp:g.mvp===id?'':id}))}
+function sync(){ed.err='';if(!ed.manual){const c=t=>(t==='A'?ed.A:ed.B).reduce((n,i)=>n+((ed.gm[i]||{}).g||0),0)+ed.og.filter(x=>x.t===t).length;ed.sa=c('A');ed.sb=c('B')}}
+function newGame(){ed={id:null,n:0,date:today(),A:[],B:[],sa:0,sb:0,gm:{},og:[],manual:false};render()}
+function editGame(id){const g=games.find(x=>x.id===id),gm={},og=[];norm(g).forEach(x=>{if(x.og)og.push({t:x.t,p:x.p});else{const c=gm[x.p]=gm[x.p]||{g:0,a:0};c.g+=x.g||0;c.a+=x.a||0}});ed={id,n:g.n||0,date:g.date,A:[...(g.A||[])],B:[...(g.B||[])],sa:g.sa||0,sb:g.sb||0,gm,og,manual:true};render();scrollTo(0,0)}
+function togP(id){if(ed.A.includes(id)){ed.A=ed.A.filter(i=>i!==id);ed.B.push(id)}else if(ed.B.includes(id)){ed.B=ed.B.filter(i=>i!==id)}else ed.A.push(id);sync();render()}
+function bump(id,k,d){const c=ed.gm[id]=ed.gm[id]||{g:0,a:0};c[k]=Math.max(0,(c[k]||0)+d);sync();render()}
+function addOG(t,p){if(p){ed.og.push({t,p});sync();render()}}
+function rmOG(i){ed.og.splice(i,1);sync();render()}
+function saveGame(){const cnt=t=>(t==='A'?ed.A:ed.B).reduce((n,i)=>n+((ed.gm[i]||{}).g||0),0)+ed.og.filter(x=>x.t===t&&(t==='A'?ed.B:ed.A).includes(x.p)).length;
+ for(const t of ['A','B']){const n=cnt(t),sc=(t==='A'?ed.sa:ed.sb)||0;if(n!==sc){ed.err=(n<sc?'List all goalscorers':'Too many goals scored in goalscorer list')+' (Team '+t+' scored '+sc+', listed '+n+')';render();return}}
+ const goals=[];[['A',ed.A],['B',ed.B]].forEach(([t,ids])=>ids.forEach(id=>{const c=ed.gm[id]||{};if(c.g||c.a)goals.push({t,p:id,g:c.g||0,a:c.a||0})}));
+ ed.og.filter(x=>(x.t==='A'?ed.B:ed.A).includes(x.p)).forEach(x=>goals.push({t:x.t,p:x.p,og:true}));
+ const data={date:ed.date||today(),n:ed.n||Date.now(),A:ed.A,B:ed.B,sa:ed.sa||0,sb:ed.sb||0,goals};
+ if(ed.id){const g=games.find(x=>x.id===ed.id)||{},inT=i=>ed.A.includes(i)||ed.B.includes(i);
+  data.dA=(g.dA||[]).filter(i=>ed.A.includes(i));data.dB=(g.dB||[]).filter(i=>ed.B.includes(i));
+  data.gkA=ed.A.includes(g.gkA)?g.gkA:'';data.gkB=ed.B.includes(g.gkB)?g.gkB:'';data.mvp=inT(g.mvp)?g.mvp:''}
+ const col=db.collection('games');w(async()=>{ed.id?await col.doc(ed.id).update(data):await col.add(data);ed=null;render()})}
+function delGame(){ask('e',()=>w(async()=>{await db.collection('games').doc(ed.id).delete();ed=null;render()}))}
+function delGame2(id){ask('g'+id,()=>w(()=>db.collection('games').doc(id).delete()))}
+function addPlayer(){const name=$('#pn').value.trim();if(!name)return;const pos=[...document.querySelectorAll('.pc:checked')].map(c=>c.value);const id=slug(name);const ex=players.find(p=>p.id===id);
+ w(()=>db.collection('players').doc(id).set({name:ex?ex.name:name,pos:[...new Set([...(ex?ex.pos||[]:[]),...pos])]}))}
+function togPos(id,k){const p=players.find(x=>x.id===id);const s=new Set(p.pos||[]);s.has(k)?s.delete(k):s.add(k);w(()=>db.collection('players').doc(id).update({pos:[...s]}))}
+function delPlayer(id){ask('p'+id,()=>w(()=>db.collection('players').doc(id).delete()))}
+(async()=>{
+ render();
+ db=await connect();
+ if(!db)return;
+ const t=setTimeout(()=>{if(!ready){ready=1;render()}},10000);
+ db.collection('players').onSnapshot(s=>{players=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.name.localeCompare(b.name));ready=1;clearTimeout(t);render()},()=>{});
+ db.collection('games').onSnapshot(s=>{games=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.n||0)-(a.n||0));render()},()=>{});
+ db.collection('totw').onSnapshot(s=>{totw={};s.docs.forEach(d=>totw[d.id]=d.data().players||[]);render()},()=>{});
+ db.collection('tots').onSnapshot(s=>{tots={};s.docs.forEach(d=>tots[d.id]=d.data().players||[]);render()},()=>{});
+ db.doc('settings/today').onSnapshot(s=>{const d=s.exists&&s.data();if(d&&d.date===today()&&!s.metadata.hasPendingWrites){here=[...(d.ids||[])];tpos={};Object.entries(d.pos||{}).forEach(([k,v])=>tpos[k]=[...v])}render()},()=>{});
+ db.doc('settings/points').onSnapshot(s=>{if(s.exists)pts={...D,...s.data()};render()},()=>{});
+})();
+</script></body></html>
